@@ -12,4 +12,6 @@ public interface CustomerCouponService {
     List<CouponResponseDto> getCustomersCoupons(Long customerId);
 
     CouponResponseDto getCustomerCoupon(Long customerId, Long couponId);
+
+    void deleteCouponFromCustomers(Long couponId);
 }

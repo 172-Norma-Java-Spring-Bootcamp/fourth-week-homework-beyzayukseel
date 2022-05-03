@@ -14,5 +14,7 @@ public interface BasketService {
 
     Basket getBasketByUserId(Long userId);
 
+    Boolean existBasket(Long basketId);
+
     void deleteBasket(Long basketId);
 }

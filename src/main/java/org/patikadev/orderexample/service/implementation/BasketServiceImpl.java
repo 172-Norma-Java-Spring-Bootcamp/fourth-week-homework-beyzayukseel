@@ -3,7 +3,6 @@ package org.patikadev.orderexample.service.implementation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.patikadev.orderexample.converter.BasketItemConverter;
-import org.patikadev.orderexample.converter.CustomerDtoConverter;
 import org.patikadev.orderexample.dto.request.CreateBasketDto;
 import org.patikadev.orderexample.dto.response.BasketItemResponseDto;
 import org.patikadev.orderexample.exception.ServiceOperationException;
@@ -24,11 +23,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class BasketServiceImpl implements BasketService {
-
     private final BasketRepository basketRepository;
     private final BasketItemService basketItemService;
     private final BasketItemConverter basketItemConverter;
-    private final CustomerDtoConverter customerDtoConverter;
 
     @Override
     public void addBasket(CreateBasketDto createBasketDto) {
@@ -36,7 +33,7 @@ public class BasketServiceImpl implements BasketService {
         customer.setId(createBasketDto.customerResponseDto().id());
         Basket basket = new Basket();
         basket.setCustomer(customer);
-        basket.setTotalPrice(BigDecimal.TEN);
+        basket.setTotalPrice(BigDecimal.ZERO);
         basketRepository.save(basket);
         log.info("Basket ID -> {} date: {} created", basket.getId(), new Date());
     }
@@ -45,7 +42,7 @@ public class BasketServiceImpl implements BasketService {
     public Basket getBasketById(Long id) {
         Basket basket = basketRepository
                 .findById(id)
-                .orElseThrow(() -> new ServiceOperationException.BasketNotFoundException("basqet not found"));
+                .orElseThrow(() -> new ServiceOperationException.BasketNotFoundException("basket not found"));
 
         List<BasketItemResponseDto> items = basketItemService.getItemsFromBasket(id);
         List<BasketItem> basketItems = items
@@ -58,7 +55,15 @@ public class BasketServiceImpl implements BasketService {
     }
 
     @Override
+    public Boolean existBasket(Long basketId) {
+        return basketRepository.existsById(basketId);
+    }
+
+    @Override
     public Customer getCustomerByBasketId(Long id) {
+        if (!basketRepository.existsById(id)) {
+            throw new ServiceOperationException.BasketNotFoundException("Basket not found");
+        }
         return basketRepository.findCustomerIdByBasket(id);
     }
 

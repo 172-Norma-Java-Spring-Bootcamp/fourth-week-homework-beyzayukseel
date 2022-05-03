@@ -35,18 +35,6 @@ public record CustomerDtoConverter(CustomerAddressConverter customerAddressConve
 
         return customer;
     }
-
-
-    public CreateCustomerDto convert(Customer customer) {
-        return new CreateCustomerDto(customer.getUsername(),
-                customer.getEmail(),
-                customer.getIdentity(),
-                customer.getGender(),
-                customer.getPassword(),
-                customerAddressConverter.convertCustomerAddressDto(customer.getCustomerAddress()));
-
-    }
-
     public CustomerResponseDto convertToCustomer(Customer customer) {
         return new CustomerResponseDto(
                 customer.getId(),
@@ -55,28 +43,5 @@ public record CustomerDtoConverter(CustomerAddressConverter customerAddressConve
                 customer.getGender(),
                 customer.getPassword(),
                 customerAddressConverter.convertToCustomerAddressDto(customer.getCustomerAddress()));
-    }
-
-    public Customer convertToCustomer(CustomerResponseDto customerResponseDto) {
-        Customer customer = new Customer();
-        customer.setId(customerResponseDto.id());
-        customer.setUsername(customerResponseDto.userName());
-        customer.setEmail(customerResponseDto.email());
-        customer.setIdentity(customerResponseDto.identity());
-        customer.setGender(customerResponseDto.gender());
-        customer.setPassword(customerResponseDto.password());
-
-        CustomerAddress customerAddress = new CustomerAddress();
-        customerAddress.setId(customerAddress.getId());
-        customerAddress.setPhoneNumber(customerResponseDto.customerAddressResponseDto().phoneNumber());
-        customerAddress.setCountry(customerResponseDto.customerAddressResponseDto().country());
-        customerAddress.setCity(customerResponseDto.customerAddressResponseDto().city());
-        customerAddress.setPostalCode(customerResponseDto.customerAddressResponseDto().postalCode());
-        customerAddress.setDescription(customerResponseDto.customerAddressResponseDto().description());
-
-        customerAddress.setCustomer(customer);
-        customer.setCustomerAddress(customerAddress);
-
-        return customer;
     }
 }

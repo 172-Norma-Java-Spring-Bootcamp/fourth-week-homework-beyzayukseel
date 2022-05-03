@@ -15,6 +15,7 @@ import org.patikadev.orderexample.model.OrderItem;
 import org.patikadev.orderexample.repository.OrderRepository;
 import org.patikadev.orderexample.service.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -43,9 +44,10 @@ public class OrderServiceImpl implements OrderService {
         return orderConverter.convertToDto(order);
     }
 
+    @Transactional
     @Override
     public void saveOrder(Long basketId) {
-        if (basketId < 0 || basketId.equals(null)) {
+        if (!basketService.existBasket(basketId)) {
             throw new ServiceOperationException.BasketNotFoundException("Basket not found");
         }
         System.out.println(basketId);
@@ -53,7 +55,12 @@ public class OrderServiceImpl implements OrderService {
         List<BasketItem> basketItems = basketItemResponseDtos.stream()
                 .map(basketItemConverter::convertToBasketItem)
                 .collect(Collectors.toList());
-        System.out.println(basketItems);
+
+        //System.out.println(basketItems);
+
+        if (basketItems.isEmpty()) {
+            throw new ServiceOperationException.OrderNotFoundException("Nothing in basket");
+        }
 
         BigDecimal totalPrice = BigDecimal.ZERO;
         Order order = new Order();
@@ -67,46 +74,50 @@ public class OrderServiceImpl implements OrderService {
                     .multiply(new BigDecimal(String.valueOf(items.getQuantity()))));
             basketItemService.deleteBasketItem(items.getId());
         }
-
-        order.setTotalPrice(totalPrice);
         String info = order.getPaymentInfo();
         order.setPaymentInfo(info);
         order.setCustomer(basketService.getCustomerByBasketId(basketId));
-        order.setOrderedDate(new Date());
+        Date orderDate = new Date();
+        order.setOrderedDate(orderDate);
+        order.setTotalPrice(totalPrice);
+        checkCustomerHasCoupon(basketService.getCustomerByBasketId(basketId).getId(), order);
         orderRepository.save(order);
     }
 
+    @Transactional
     @Override
     public void deleteOrder(Long id) {
-        if (id < 0) {
+        if (orderRepository.existsById(id)) {
             throw new ServiceOperationException.OrderNotFoundException("Order not found");
         }
         orderRepository.deleteById(id);
     }
 
-    void checkCustomerHasCoupon(Long customerId, Date orderDate, BigDecimal totalAmount) {
+    void checkCustomerHasCoupon(Long customerId, Order order) {
         List<CouponResponseDto> couponResponseDtoList = customerCouponService.getCustomersCoupons(customerId);
         if (couponResponseDtoList.isEmpty()) {
             log.info("Customer ID{} has no coupons", customerId);
         } else {
-            validCustomerCoupon(couponResponseDtoList, orderDate, totalAmount);
+            validCustomerCoupon(couponResponseDtoList, order);
         }
     }
 
-    void validCustomerCoupon(List<CouponResponseDto> couponResponseDtoList, Date orderDate, BigDecimal totalAmount) {
+    void validCustomerCoupon(List<CouponResponseDto> couponResponseDtoList, Order order) {
         List<Integer> discountAmounts = new ArrayList<>();
         for (CouponResponseDto couponResponseDto : couponResponseDtoList) {
-            if (orderDate.after(couponResponseDto.startDate()) && orderDate.before(couponResponseDto.endDate())) {
-                discountAmounts.add(couponResponseDto.amount());
+            if (order.getOrderedDate().after(couponResponseDto.startDate()) && order.getOrderedDate().before(couponResponseDto.endDate())) {
+                discountAmounts.add(couponResponseDto.discountAmount());
             }
         }
-        implementCouponsDiscount(discountAmounts, totalAmount);
+        implementCouponsDiscount(discountAmounts, order);
     }
 
-    private BigDecimal implementCouponsDiscount(List<Integer> discountAmounts, BigDecimal totalAmount) {
+    private void implementCouponsDiscount(List<Integer> discountAmounts, Order order) {
         for (Integer discounts : discountAmounts) {
-            totalAmount = totalAmount.subtract(BigDecimal.valueOf(discounts));
+            if (order.getTotalPrice().compareTo(BigDecimal.valueOf(discounts)) > 0) {
+                order.setTotalPrice(order.getTotalPrice().subtract(BigDecimal.valueOf(discounts)));
+            }
+            System.out.println("order price is" + order.getTotalPrice());
         }
-        return totalAmount;
     }
 }

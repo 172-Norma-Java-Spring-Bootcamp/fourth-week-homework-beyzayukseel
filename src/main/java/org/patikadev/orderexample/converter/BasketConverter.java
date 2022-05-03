@@ -11,15 +11,6 @@ import org.springframework.stereotype.Component;
 public class BasketConverter {
     private final CustomerDtoConverter customerDtoConverter;
 
-    public Basket convertToEntity(CreateBasketDto createBasketDto) {
-        Basket basket = new Basket();
-        basket.setCustomer(customerDtoConverter.convertToCustomer(createBasketDto.customerResponseDto()));
-        basket.setTotalPrice(createBasketDto.totalPrice());
-        basket.setTaxPrice(createBasketDto.taxPrice());
-        basket.setShippingPrice(createBasketDto.shippingPrice());
-        return basket;
-    }
-
     public CreateBasketDto convertToDto(Basket basket) {
         CreateBasketDto createBasketDto = new CreateBasketDto(
                 customerDtoConverter.convertToCustomer(basket.getCustomer()),

@@ -8,6 +8,8 @@ import org.patikadev.orderexample.model.Basket;
 import org.patikadev.orderexample.service.BasketItemService;
 import org.patikadev.orderexample.service.BasketService;
 import org.patikadev.orderexample.validator.implementation.BasketIDValidator;
+import org.patikadev.orderexample.validator.implementation.CreateBasketItemValidator;
+import org.patikadev.orderexample.validator.implementation.CreateBasketValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,15 +23,19 @@ public class BasketController {
     private final BasketService basketService;
     private final BasketItemService basketItemService;
     private final BasketIDValidator basketIdValidator;
+    private final CreateBasketValidator createBasketValidator;
+    private final CreateBasketItemValidator createBasketItemValidator;
 
     @PostMapping()
     public ResponseEntity<?> createBasket(@RequestBody CreateBasketDto createBasketDto) {
+        createBasketValidator.validate(createBasketDto);
         basketService.addBasket(createBasketDto);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/addItem")
     public ResponseEntity<?> addItemToBasket(@RequestBody CreateBasketItemDto createBasketItemDto) {
+        createBasketItemValidator.validate(createBasketItemDto);
         basketItemService.addItemToBasket(createBasketItemDto);
         return ResponseEntity.ok().build();
     }

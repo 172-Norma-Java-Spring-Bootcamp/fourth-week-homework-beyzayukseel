@@ -13,5 +13,7 @@ public interface CustomerService {
 
     void deleteCustomer(Long id);
 
+    Boolean existCustomerById(Long customerId);
+
     List<CustomerResponseDto> getAllCustomers();
 }

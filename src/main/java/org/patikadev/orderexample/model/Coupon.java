@@ -16,5 +16,5 @@ public class Coupon extends BaseModel {
     private Date endDate;
     private String code;
     private int quantity;
-    private int amount;
+    private int discountAmount;
 }

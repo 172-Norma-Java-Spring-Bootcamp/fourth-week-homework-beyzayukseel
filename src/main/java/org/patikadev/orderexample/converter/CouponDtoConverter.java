@@ -10,7 +10,7 @@ public class CouponDtoConverter {
 
     public Coupon convertToEntity(CreateCouponDto createCouponDto) {
         Coupon coupon = new Coupon();
-        coupon.setAmount(createCouponDto.amount());
+        coupon.setDiscountAmount(createCouponDto.discountAmount());
         coupon.setDescription(createCouponDto.description());
         coupon.setStartDate(createCouponDto.startDate());
         coupon.setEndDate(createCouponDto.endDate());
@@ -21,6 +21,6 @@ public class CouponDtoConverter {
 
     public CouponResponseDto convertToResponseDto(Coupon coupon) {
         return new CouponResponseDto(coupon.getId(), coupon.getTitle(), coupon.getDescription(),
-                coupon.getStartDate(), coupon.getEndDate(), coupon.getAmount(), coupon.getCode(), coupon.getQuantity());
+                coupon.getStartDate(), coupon.getEndDate(), coupon.getDiscountAmount(), coupon.getCode(), coupon.getQuantity());
     }
 }

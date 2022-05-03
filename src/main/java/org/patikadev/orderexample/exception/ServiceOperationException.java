@@ -35,6 +35,12 @@ public final class ServiceOperationException {
         }
     }
 
+    public static class BasketItemNotFoundException extends BaseException {
+        public BasketItemNotFoundException(String message) {
+            super(message);
+        }
+    }
+
     public static class BrandNotFoundException extends BaseException {
         public BrandNotFoundException(String message) {
             super(message);
@@ -49,6 +55,12 @@ public final class ServiceOperationException {
 
     public static class OrderItemNotFoundException extends BaseException {
         public OrderItemNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    public static class CouponNotFoundException extends BaseException {
+        public CouponNotFoundException(String message) {
             super(message);
         }
     }

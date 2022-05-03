@@ -1,6 +1,7 @@
 package org.patikadev.orderexample.service.implementation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.patikadev.orderexample.converter.OrderItemConverter;
 import org.patikadev.orderexample.dto.request.CreateOrderItemDto;
 import org.patikadev.orderexample.dto.response.OrderItemResponseDto;
@@ -10,10 +11,11 @@ import org.patikadev.orderexample.repository.OrderItemRepository;
 import org.patikadev.orderexample.service.OrderItemService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class OrderItemServiceImpl implements OrderItemService {
@@ -24,6 +26,7 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Override
     public void createOrderItem(CreateOrderItemDto createOrderItemDto) {
         orderItemRepository.save(orderItemConverter.convertToOrderItem(createOrderItemDto));
+        log.info("Order date: {} created", new Date());
     }
 
     @Override
@@ -44,7 +47,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public void deleteOrderItem(Long id) {
-        if (id < 0) {
+        if (!orderItemRepository.existsById(id)) {
             throw new ServiceOperationException.OrderItemNotFoundException("Order item not found");
         }
         orderItemRepository.deleteById(id);

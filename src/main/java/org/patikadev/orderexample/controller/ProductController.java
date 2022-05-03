@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.patikadev.orderexample.dto.request.CreateProductDto;
 import org.patikadev.orderexample.dto.response.ProductResponseDto;
 import org.patikadev.orderexample.service.ProductService;
+import org.patikadev.orderexample.validator.implementation.CreateProductValidator;
 import org.patikadev.orderexample.validator.implementation.ProductIDValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +19,12 @@ public class ProductController {
 
     private final ProductService productService;
     private final ProductIDValidator productIdValidator;
+    private final CreateProductValidator createProductValidator;
 
     @PostMapping
     @Transactional
     public ResponseEntity<?> createProduct(@RequestBody CreateProductDto createProductDto) {
+        createProductValidator.validate(createProductDto);
         productService.create(createProductDto);
         return ResponseEntity.ok().build();
     }

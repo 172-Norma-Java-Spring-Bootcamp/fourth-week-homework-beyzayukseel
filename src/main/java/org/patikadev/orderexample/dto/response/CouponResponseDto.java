@@ -6,7 +6,7 @@ public record CouponResponseDto(Long id, String title,
                                 String description,
                                 Date startDate,
                                 Date endDate,
-                                int amount,
+                                int discountAmount,
                                 String code,
                                 int quantity) {
 }

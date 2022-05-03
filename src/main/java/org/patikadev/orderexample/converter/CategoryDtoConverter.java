@@ -30,5 +30,4 @@ public record CategoryDtoConverter() {
         category.setParent(categoryResponseDto.parent());
         return category;
     }
-
 }

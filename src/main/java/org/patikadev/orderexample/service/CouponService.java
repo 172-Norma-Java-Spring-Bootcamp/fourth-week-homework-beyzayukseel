@@ -10,5 +10,7 @@ public interface CouponService {
 
     CouponResponseDto getCouponById(Long couponId);
 
-    void deleteCouponById(Long couponId);
+    void deleteCouponsById(Long couponId);
+
+    Boolean existsCouponById(Long couponId);
 }

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.patikadev.orderexample.converter.BasketItemConverter;
 import org.patikadev.orderexample.dto.request.CreateBasketItemDto;
 import org.patikadev.orderexample.dto.response.BasketItemResponseDto;
+import org.patikadev.orderexample.exception.ServiceOperationException;
 import org.patikadev.orderexample.model.Basket;
 import org.patikadev.orderexample.model.BasketItem;
 import org.patikadev.orderexample.model.Product;
@@ -29,6 +30,7 @@ public class BasketItemServiceImpl implements BasketItemService {
         BasketItem basketItem = new BasketItem();
         Basket basket = new Basket();
         basket.setId(createBasketItemDto.basketId());
+        basket.setTotalPrice(basket.getTotalPrice().add(basketItem.getPrice()));
         basketItem.setBasket(basket);
         Product product = new Product();
         product.setId(createBasketItemDto.productId());
@@ -53,6 +55,9 @@ public class BasketItemServiceImpl implements BasketItemService {
 
     @Override
     public void deleteBasketItem(Long basketItemId) {
+        if (!basketItemRepository.existsById(basketItemId)) {
+            throw new ServiceOperationException.BasketItemNotFoundException("Item not found");
+        }
         basketItemRepository.deleteById(basketItemId);
     }
 }
